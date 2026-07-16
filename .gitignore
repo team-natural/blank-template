@@ -20,5 +20,14 @@ yarn-error.log*
 dist/
 build/
 
+# --- Secrets / local env ---
+.dev.vars
+.env
+.env.*
+!.devcontainer/.env
+
+# --- Claude Code ---
+settings.local.json
+
 # --- Others ---
 *.log
