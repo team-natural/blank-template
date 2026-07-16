@@ -11,6 +11,10 @@
     "ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
   },
 
+  "containerEnv": {
+    "ENABLE_CLAUDEAI_MCP_SERVERS": "false"
+  },
+
   "mounts": [
     {
       "source": "${localEnv:HOME}${localEnv:USERPROFILE}/.claude",

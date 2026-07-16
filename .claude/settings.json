@@ -1,4 +1,9 @@
 {
+  "enabledMcpjsonServers": [
+    "context7",
+    "context-mode",
+    "semble"
+  ],
   "permissions": {
     "allow": [
       "Bash(npm *)",
