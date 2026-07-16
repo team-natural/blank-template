@@ -1,0 +1,11 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ${COMPOSE_PROJECT_NAME}_app
+    ports:
+      - "${APP_PORT_DEV}:5173"
+    volumes:
+      - ../..:/workspaces:cached
+    command: sleep infinity

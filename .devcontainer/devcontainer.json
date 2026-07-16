@@ -1,0 +1,22 @@
+{
+  "name": "BLANK-TEMPLATE",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    }
+  },
+
+  "forwardPorts": [5173],
+  "portsAttributes": {
+    "5173": {
+      "label": "Dev Server",
+      "onAutoForward": "notify"
+    }
+  },
+
+  "postCreateCommand": "bash .devcontainer/setup.sh"
+}
