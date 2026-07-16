@@ -5,8 +5,7 @@
       "url": "https://mcp.context7.com/mcp"
     },
     "context-mode": {
-      "command": "npx",
-      "args": ["-y", "context-mode"]
+      "command": "context-mode"
     },
     "semble": {
       "command": "uvx",

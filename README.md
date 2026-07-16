@@ -37,8 +37,8 @@ When creating a new project from this template, first update the following:
 docker compose -f .devcontainer/docker-compose.yml up -d
 ```
 
-Once started, the host port specified by `APP_PORT_DEV` is forwarded to port `5173` in the
-container (VS Code will show an automatic port-forward notification labeled "Dev Server").
+Once started, container port `5173` is published to the host port specified by `APP_PORT_DEV`
+(handled by docker compose; change `APP_PORT_DEV` per project to avoid collisions).
 
 ## Using Claude Code
 

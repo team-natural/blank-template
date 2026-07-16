@@ -2,7 +2,7 @@
   "name": "BLANK-TEMPLATE",
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
-  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "workspaceFolder": "/workspace",
 
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
@@ -28,7 +28,6 @@
     }
   ],
 
-  "forwardPorts": [5173],
   "portsAttributes": {
     "5173": {
       "label": "Dev Server",

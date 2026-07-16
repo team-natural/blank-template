@@ -26,36 +26,39 @@ itself), update these first:
 - CLI: `docker compose -f .devcontainer/docker-compose.yml up -d`
 
 On first startup, `.devcontainer/setup.sh` runs automatically as the `postCreateCommand`: it runs
-`npm install`, installs the `context-mode` MCP server globally, and approves its pending install
-scripts (needed for its `better-sqlite3` dependency).
+`npm install` and installs the `context-mode` MCP server globally (inside the container).
 
 ## Container architecture
 
-- `docker-compose.yml` mounts the entire `../..` (i.e. the parent of the repo, `/workspaces`) into
-  the container at `/workspaces`, not just this repo — this lets multiple sibling projects share
-  one running container context. The container itself just `sleep infinity`s; devcontainer tooling
-  execs into it.
+- `docker-compose.yml` mounts only this repository into the container at `/workspace`
+  (`workspaceFolder` in `devcontainer.json` matches). Sibling projects on the host are deliberately
+  NOT visible from inside the container — each project gets its own isolated container. The
+  container itself just `sleep infinity`s; devcontainer tooling execs into it.
 - `devcontainer.json` adds two Dev Container Features: Node.js (`lts`) and `claude-code`, so both
-  `node`/`npm` and the `claude` CLI are available with no manual setup.
+  `node`/`npm` and the `claude` CLI are available with no manual setup and nothing is installed on
+  the host.
 - The host's `~/.claude` and `~/.claude.json` are bind-mounted in, so Claude Code auth/settings
-  from the host carry over into the container automatically.
-- `Dockerfile` is based on `mcr.microsoft.com/devcontainers/base:bullseye` and additionally
-  installs `uv` (required by the Semble MCP server, which runs via `uvx`). mkcert is deliberately
-  **not** installed in-container — HTTPS certs are meant to be generated on the host and mounted in.
+  from the host carry over into the container automatically. These must exist on the host before
+  first startup — otherwise Docker creates empty directories at those paths on the host.
+- `Dockerfile` is based on `mcr.microsoft.com/devcontainers/base:bookworm` and additionally
+  installs `uv` (required by the Semble MCP server, which runs via `uvx`).
 
 ## Port configuration
 
-`.devcontainer/.env`'s `APP_PORT_DEV` forwards to port 5173 inside the container and defaults to
-5173. The intended workflow is running multiple projects created from this template side by side,
-so `APP_PORT_DEV` is expected to be changed per project to avoid port collisions — don't assume
-5173 is fixed or safe to hardcode elsewhere.
+Container port 5173 is published to the host port set by `APP_PORT_DEV` in `.devcontainer/.env`
+(default 5173), via the `ports` mapping in `docker-compose.yml`. The intended workflow is running
+multiple projects created from this template side by side, so `APP_PORT_DEV` is expected to be
+changed per project to avoid port collisions — don't assume 5173 is fixed or safe to hardcode
+elsewhere. Port publishing is handled entirely by docker compose; `devcontainer.json` deliberately
+has no `forwardPorts` (it would pin the host port to 5173 and defeat `APP_PORT_DEV`).
 
 ## MCP servers
 
 Configured in `.mcp.json` and enabled in `.claude/settings.json`:
 
 - `context7` — remote HTTP server for up-to-date library/framework docs.
-- `context-mode` — local context-compression server, installed globally by `setup.sh`.
+- `context-mode` — local context-compression server, installed globally (in-container) by
+  `setup.sh` and invoked directly by command name.
 - `semble` — local code search server, run via `uvx` (needs the `uv` install in the Dockerfile).
 
 ## Current state / commands
