@@ -3,37 +3,17 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/workspace",
-
   "features": {
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "lts"
-    },
+    "ghcr.io/devcontainers/features/node:1": { "version": "24" },
     "ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
   },
-
   "containerEnv": {
-    "ENABLE_CLAUDEAI_MCP_SERVERS": "false"
+    "ENABLE_CLAUDEAI_MCP_SERVERS": "false",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "DISABLE_AUTOUPDATER": "1"
   },
-
-  "mounts": [
-    {
-      "source": "${localEnv:HOME}${localEnv:USERPROFILE}/.claude",
-      "target": "/home/vscode/.claude",
-      "type": "bind"
-    },
-    {
-      "source": "${localEnv:HOME}${localEnv:USERPROFILE}/.claude.json",
-      "target": "/home/vscode/.claude.json",
-      "type": "bind"
-    }
-  ],
-
   "portsAttributes": {
-    "5173": {
-      "label": "Dev Server",
-      "onAutoForward": "notify"
-    }
+    "5173": { "label": "Dev Server", "onAutoForward": "notify" }
   },
-
   "postCreateCommand": "bash .devcontainer/setup.sh"
 }

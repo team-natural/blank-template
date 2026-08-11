@@ -3,9 +3,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ${COMPOSE_PROJECT_NAME}_app
     ports:
-      - "${APP_PORT_DEV}:5173"
+      - "127.0.0.1:${APP_PORT_DEV}:${APP_PORT_DEV}"
+    environment:
+      - APP_PORT_DEV=${APP_PORT_DEV}
+      - CLAUDE_CONFIG_DIR=/home/vscode/.claude
     volumes:
       - ..:/workspace:cached
+      - claude-config:/home/vscode/.claude
     command: sleep infinity
+
+volumes:
+  claude-config:

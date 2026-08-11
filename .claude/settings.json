@@ -9,7 +9,8 @@
       "Bash(npm *)",
       "Bash(npx *)",
       "Bash(node *)",
-      "Bash(python3 *)"
+      "Bash(python3 *)",
+      "mcp__context7"
     ]
   }
 }
