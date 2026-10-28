@@ -27,8 +27,16 @@ itself), update these first:
 - VS Code: run `Dev Containers: Reopen in Container` from the command palette
 - CLI: `docker compose -f .devcontainer/docker-compose.yml up -d`
 
-On first startup, `.devcontainer/setup.sh` runs automatically as the `postCreateCommand`: it runs
-`npm install` and installs the `context-mode` MCP server globally (inside the container).
+On first startup, `.devcontainer/setup.sh` runs automatically as the `postCreateCommand`: it
+updates the `claude` CLI to `@anthropic-ai/claude-code@latest`, runs `npm install`, and installs the
+`context-mode` MCP server globally (inside the container).
+
+The `claude` CLI update exists because new models require a recent CLI version. The `claude-code`
+Feature installs the package as root, so `setup.sh` first hands the global
+`node_modules/@anthropic-ai` directory to the current user (group read from the npm global root,
+not hardcoded). The update is non-fatal — if it fails (e.g. offline rebuild), the image's version
+is kept and setup continues. `DISABLE_AUTOUPDATER=1` is set in `containerEnv`, so the CLI is only
+updated at container creation, not in the background.
 
 ## Container architecture
 
@@ -36,9 +44,10 @@ On first startup, `.devcontainer/setup.sh` runs automatically as the `postCreate
   (`workspaceFolder` in `devcontainer.json` matches). Sibling projects on the host are deliberately
   NOT visible from inside the container — each project gets its own isolated container. The
   container itself just `sleep infinity`s; devcontainer tooling execs into it.
-- `devcontainer.json` adds two Dev Container Features: Node.js (`24`) and `claude-code`, so both
+- `devcontainer.json` adds two Dev Container Features: Node.js (`26`) and `claude-code`, so both
   `node`/`npm` and the `claude` CLI are available with no manual setup and nothing is installed on
-  the host.
+  the host. Node is pinned to the major version only, so each build gets the latest `26.x` patch
+  release (use "Rebuild Without Cache" to pick up a newer patch).
 - Claude Code auth/settings persist in a named Docker volume (`claude-config`, mounted at
   `/home/vscode/.claude`) rather than being bind-mounted from the host, so each project container
   has its own independent login and does not read or write `~/.claude` on the host. `CLAUDE_CONFIG_DIR`
@@ -56,12 +65,9 @@ Both sides of the port mapping in `docker-compose.yml` use `APP_PORT_DEV` from `
 number on the host, bound to `127.0.0.1` only. The intended workflow is running multiple projects
 created from this template side by side, so `APP_PORT_DEV` is expected to be changed per project to
 avoid port collisions — don't assume 5173 is fixed or safe to hardcode elsewhere. Port publishing is
-handled entirely by docker compose; `devcontainer.json` deliberately has no `forwardPorts`.
-
-Note: `devcontainer.json`'s `portsAttributes` still keys its dev-server label on the literal port
-`"5173"`. If `APP_PORT_DEV` is changed away from 5173 for a project, that label will no longer match
-the actual forwarded port — update the `portsAttributes` key alongside `APP_PORT_DEV` when
-bootstrapping a project that needs a different port.
+handled entirely by docker compose; `devcontainer.json` deliberately has no `forwardPorts`
+or `portsAttributes` (its keys are literal port numbers, so a hardcoded key would drift out of
+sync whenever `APP_PORT_DEV` changes), and `APP_PORT_DEV` is the only place the port needs changing.
 
 ## MCP servers
 
